@@ -1,5 +1,9 @@
 # Disaster Response Pipeline Project
 
+During a natural disaster, responsiveness to requests, alerts, and other messages is paramount to ensure the success of recovery mission, and in many cases can mean life-or-death for victims.
+
+This project builds a Machine Learning pipeline that pre-processes & parses _Figure Eight_'s disaster message dataset to train a supervised learning model that can accurately categorize incoming messages to their respective categories (and dispatch them to the proper disaster response organization).
+
 ### Instructions:
 1. Run the following commands in the project's root directory to set up your database and model.
 

@@ -5,6 +5,15 @@ import numpy as np
 from sqlalchemy import create_engine
 
 def load_data(messages_filepath, categories_filepath):
+    '''
+    INPUT:
+    messages_filepath - (str) file path for messages database
+    categories_filepath - (str) file path for categories database
+    
+    OUTPUT:
+    df - (pandas dataframe) df with merged inputs (messages + categories)
+    
+    '''
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
     
@@ -13,6 +22,14 @@ def load_data(messages_filepath, categories_filepath):
     return df
 
 def clean_data(df):
+    '''
+    INPUT:
+    df - (pandas dataframe) df with merged dataset (see "load_data") 
+    
+    OUTPUT:
+    df - (pandas dataframe) Cleaned up df (i.e. categories dummified, 1st row removed, duplicates removed) 
+    
+    '''
     # create a dataframe of the 36 individual category columns
     categories = df['categories'].str.split(pat=';', expand=True)
     
@@ -44,6 +61,15 @@ def clean_data(df):
 
 
 def save_data(df, database_filename):
+    '''
+    INPUT:
+    df - (pandas dataframe) df with cleaned up & post-processed data
+    database_filename - (str) file name for database
+    
+    OUTPUT:
+    none
+    
+    '''
     engine = create_engine('sqlite:///' + database_filename)
     df.to_sql('categorized_msgs', engine, index=False)
     

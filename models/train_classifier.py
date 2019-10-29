@@ -19,6 +19,16 @@ from sklearn.metrics import classification_report
 import pickle
 
 def load_data(database_filepath):
+    '''
+    INPUT:
+    database_filepath - (str) file path for database
+    
+    OUTPUT:
+    X - (pandas dataframe) df with independent variables
+    Y - (pandas dataframe) df with dependent variables
+    list(Y) - (list) list with category names
+    
+    '''
     engine = create_engine('sqlite:///' + database_filepath)
     df = pd.read_sql_table('categorized_msgs', engine)
     X = df['message'].values
@@ -28,6 +38,14 @@ def load_data(database_filepath):
 
 
 def tokenize(text):
+    '''
+    INPUT:
+    text - (str) raw text message to perform lemmatization + tokenization
+    
+    OUTPUT:
+    clean_tokens - (array) Array of lemmatized words
+    
+    '''
     tokens = word_tokenize(text)
     lemmatizer = WordNetLemmatizer()
     
@@ -38,15 +56,42 @@ def tokenize(text):
     return clean_tokens
 
 def build_model():
+    '''
+    INPUT:
+    none
+    
+    OUTPUT:
+    pipeline - (pipeline) NLP pipeline that performs classification based on tokenized messages
+    
+    '''
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
         ('clf', MultiOutputClassifier(RandomForestClassifier()))
     ])
+    
+    parameters = {
+        'vect__max_df': (0.5, 0.75, 1.0),
+        'tfidf__use_idf': (True, False),
+        'clf__estimator__min_samples_split': [2, 3]
+    }
 
-    return pipeline
+    cv = GridSearchCV(pipeline, param_grid=parameters)
+
+    return cv
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    '''
+    INPUT:
+    model - (pipeline) NLP classification pipeline trained by "build_model"
+    X_test - (pandas dataframe) df with testing set for X
+    Y_test - (pandas dataframe) df with testing set for Y
+    category_names - (list) list with unique category names
+    
+    OUTPUT:
+    none
+    
+    '''
     y_pred = model.predict(X_test)
 
     for i, y_pred_col in enumerate(y_pred.transpose()):
